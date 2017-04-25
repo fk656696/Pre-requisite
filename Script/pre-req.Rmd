@@ -1,0 +1,71 @@
+---
+title: "pre-req_Khan"
+author: "Firasath Ali Khan"
+date: "April 17, 2017"
+output: html_document
+---
+
+```{r}
+getwd()
+setwd("G:/Rockhurst spring/ADM/pre-req/data")
+Wine<-read.csv("G:/Rockhurst spring/ADM/pre-req/data/wine.csv")
+#Dimension of dataset
+dim(Wine)
+# Summarizing all numeric variables
+summary(Wine[2:14])
+```
+# Creating a New Variable 
+```{r}
+Wine$log_alcohol<-log(Wine$Alcohol)
+names(Wine)
+```
+#Creating a new categorical variable 
+```{r}
+Wine$high_Magnesium<-ifelse(Wine$Magnesium < 100,"low","high")
+View(Wine)
+```
+#Create tukey's 5-numbers of the Magnesium variable
+```{r}
+summary(Wine$Magnesium)
+fivenum(Wine$Magnesium)
+```
+# Create a scatter plot of Malic_Acid and Ash, Add trend line and labels.
+```{r}
+plot(Wine$Malic_Acid~Wine$Ash)
+abline(lm(Wine$Malic_Acid~Wine$Ash))
+text(Wine$Malic_Acid~Wine$Ash)
+```
+# 3 Box Plot's.
+```{r}
+boxplot(Wine$Proline~Wine$Type, ylab= 'Proline', main= 'Boxplot Distribution of Proline by Type', col="Blue")
+```
+# Creating a New dataframe.
+```{r}
+Wine_A<-Wine[Wine$Type == 'A' & Wine$Magnesium > 100, ]
+head(Wine_A, n=5)
+```
+# Aggregate the data of the average of alcohol and proline BY type, Use Xtable.
+```{r results = "asis"}
+nu<-aggregate(data = Wine, Proline+Alcohol~Type, mean)
+print(xtable::xtable(nu, caption = "Summary of Alocohol and Proline by Type"), type = "html", html.table.attributes = "border=1.8")
+```
+# Create Correlation & Covariance Matrix of numeric variables
+```{r}
+d<-Wine[,c(2:14)]
+cor(d)
+cov(d)
+```
+# Create a Histogram & ggplot of Malic Acid.
+```{r}
+hist(Wine$Malic_Acid)
+library(ggplot2)
+ggplot(data=Wine) + geom_histogram(aes(x=Malic_Acid))
+# The variable Malic Acid is not normally distributed and is positively skewed.
+```
+# t-test
+```{r}
+#H0= Mean of high Magnesium level in Alcohol is equal to mean of low Magnesium level in Alcohol.
+#H1= Mean of high Magnesium level in Alcohol is not equal to mean of low Magnesium level in Alcohol.
+t.test(Wine$Alcohol~Wine$high_Magnesium)
+# The level of significance is set as 0.05. The p-value is much smaller than 0.05, so we can not reject that Mean of high Magnesium level in Alcohol is not equal to the mean of low Magnesium level in Alcohol.
+```
